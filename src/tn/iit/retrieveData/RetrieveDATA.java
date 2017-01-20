@@ -25,64 +25,38 @@ public class RetrieveDATA extends DefaultRedis {
 
 	}
 	
-	
-	@Before
-	public void setUp() throws Exception {
-		decrypter = new LoraDecrypter(
-				Hex.decode("1533B69B0EFDCD498391C6F9EA0A3515"));
-	}
-	/*rivate boolean matches(byte[] decrypted, String hexExpected)
-	{
-		// Convert byte to hex string
-		String hexString = ByteUtils.toHexString(decrypted);
-		hexExpected = hexExpected.replaceAll(" ", "");
-		return hexString.startsWith(hexExpected);// Cause of trailing zeroes
-	}*/
-	
-	
 	@Override
 	public void handle(String channel, String message) {
 		Object object = null;
-		//super.handle(channel, message);
+		super.handle(channel, message);
 		byte[] bytes = DatatypeConverter.parseHexBinary(message);
 		try {
 			byte [] subArray = Arrays.copyOfRange(bytes, 12, bytes.length);
 			String messages=new String(subArray, "UTF-8");
 			if (messages.contains("rxpk"))
 			{
-			//System.out.println(messages);
-			//JSONObject jsonObj = (JSONObject)JSONValue.parse(messages);
 				JSONParser jsonParser=new JSONParser();
 				object = jsonParser.parse(messages);
 				JSONArray  array=new JSONArray();
 				array.add(object);
 				JSONObject objet = (JSONObject)array.get(0);
-				//System.out.println(arrayObj.toString());
-				//System.out.println(objet.get("rxpk"));
 				JSONArray objetDesire=(JSONArray)objet.get("rxpk");
 				JSONObject msg= (JSONObject)objetDesire.get(0);
 				String data=msg.get("data").toString();
-				//System.out.println(data);
 				decrypter = new LoraDecrypter(
-						Hex.decode("1533B69B0EFDCD498391C6F9EA0A3515"));
+						Hex.decode("App Key"));
 				byte[] decrypt = decrypter.decrypt(data);
 				byte [] subDecrypt = Arrays.copyOfRange(decrypt,0, (decrypt.length)-4);
 				String affiche=new String(subDecrypt, Charset.forName("UTF-8"));
 				System.out.println(affiche);
 			}
-			//byte[] decrypt = decrypter.decrypt(objet.get("data").toString());
-			//System.out.println(decrypt.toString());
 		} catch (UnsupportedEncodingException | ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		//String hex = DatatypeConverter.printHexBinary(decrypt);
-		
+		}		
 	}
 
 	public static void main(String[] args) {
-		RetrieveDATA receiveRedisFrame = new RetrieveDATA("lora", "soitech.cloudapp.net");
+		RetrieveDATA receiveRedisFrame = new RetrieveDATA("lora", "@ du serveur");
 		receiveRedisFrame.start();
 
 	}
